@@ -111,8 +111,8 @@
     }, 0);
   };
 
-  /** تنسيق مبلغ بصيغة الريال القطري */
+  /** تنسيق مبلغ بصيغة الريال العماني */
   window.CartFormatKWD = function (num) {
-    return (num || 0).toFixed(3) + ' ر.ق';
+    return (num || 0).toFixed(3) + ' ر.ع';
   };
 })();

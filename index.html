@@ -112,11 +112,11 @@ h1 { font-size: 24px; color: #111; line-height: 1.5; font-weight: 800; }
     <div class="Header_nav__DVSK7">
       <div class="Header_logoWithCatalog__v4fgc">
         <a class="Logo_logo__oq6_b" href="/">
-        <img alt="أرياف" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmDDFXx9xrqPWzlip-LHJZxxSe-Wck6nSafF7jAb97cCGx_uXsJALrJv8p&s=10" class="Logo_fullLogo__l2rPp"></a>
+        <img alt="أرياف" src="assets/images/areaf-logo.webp" class="Logo_fullLogo__l2rPp"></a>
       </div>
       <div class="Header_sideWrapper__3FSV4">
         <div class="CartButton_wrapper__DN_bX">
-          
+          <button class="Button_primary__SrbPy" type="button" onclick="goToCart()">🛒 السلة (<span id="header-total">0.000 ر.ع</span>)</button>
         </div>
       </div>
     </div>
@@ -164,8 +164,9 @@ h1 { font-size: 24px; color: #111; line-height: 1.5; font-weight: 800; }
 <footer class="footer">أرياف — توصيل المنتجات الطازجة في عمان OM<br>
 <a href="/">الرئيسية</a> · <a href="/terms.html">الشروط والأحكام</a> · <a href="/privacy.html">سياسة الخصوصية</a></footer>
 
+<script src="./assets/js/cart.js"></script>
 <script>
-// تعريف بيانات المنتج الثابت (تمت إضافتها لتتوافق مع السعر الجديد 5.000)
+// بيانات المنتج المعروض في الصفحة
 const staticProduct = {
   id: "product-01",
   name: "طماطم طازجة محلية (1 كيلو)",
@@ -174,35 +175,14 @@ const staticProduct = {
   desc: "طماطم محلية طازجة ومقطوفة بعناية من المزرعة مباشرة."
 };
 
-// دوال إدارة السلة محلياً في الـ LocalStorage
-function getCart() {
-  try {
-    return JSON.parse(localStorage.getItem('aryaf_cart') || '[]');
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveCart(cart) {
-  localStorage.setItem('aryaf_cart', JSON.stringify(cart));
-}
-
+// إضافة المنتج إلى السلة الموحّدة (نفس مفتاح cart.js المستخدم في cartepage.html)
 function orderNow() {
-  let cart = getCart();
-  let existingIndex = cart.findIndex(item => item.name === staticProduct.name);
-  
-  if (existingIndex > -1) {
-    cart[existingIndex].qty = (cart[existingIndex].qty || 1) + 1;
-  } else {
-    cart.push({
-      id: staticProduct.id,
-      name: staticProduct.name,
-      price: staticProduct.price,
-      img: staticProduct.img,
-      qty: 1
-    });
-  }
-  saveCart(cart);
+  window.CartAdd({
+    name: staticProduct.name,
+    desc: staticProduct.desc,
+    price: staticProduct.price,
+    img: staticProduct.img
+  });
   goToCart();
 }
 
@@ -211,33 +191,11 @@ function goToCart() {
 }
 
 function updateCartUI() {
-  const cart = getCart();
-  let totalCount = 0;
-  let totalPrice = 0;
-
-  cart.forEach(item => {
-    totalCount += (item.qty || 0);
-    totalPrice += (item.price || 0) * (item.qty || 0);
-  });
-
+  const totalPrice = window.CartTotal ? window.CartTotal() : 0;
   const formattedPrice = totalPrice.toFixed(3) + ' ر.ع';
   document.getElementById('header-total').textContent = formattedPrice;
-  document.getElementById('footer-total').textContent = formattedPrice;
-  document.getElementById('footer-count').textContent = totalCount;
-
-  const bar = document.getElementById('floating-cart-bar');
-  const text = document.getElementById('cart-text-content');
-  
-  if (totalCount > 0) {
-    bar.classList.add('active-cart');
-    text.innerHTML = '<span>&#8249;</span> اذهب الى السلة (' + totalCount + ' منتج)';
-  } else {
-    bar.classList.remove('active-cart');
-    text.textContent = 'سلة المنتجات فارغة';
-  }
 }
 
-// تحديث الواجهة عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
   updateCartUI();
 });
